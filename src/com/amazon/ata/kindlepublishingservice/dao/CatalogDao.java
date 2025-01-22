@@ -58,4 +58,7 @@ public class CatalogDao {
         }
         return results.get(0);
     }
+    public void save(CatalogItemVersion catalogItemVersion) {
+        dynamoDbMapper.save(catalogItemVersion);
+    }
 }
