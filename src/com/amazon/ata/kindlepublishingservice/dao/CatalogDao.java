@@ -26,6 +26,13 @@ public class CatalogDao {
         this.dynamoDbMapper = dynamoDbMapper;
     }
 
+    public void validateBookExists(String bookId) {
+        CatalogItemVersion book = getLatestVersionOfBook(bookId);
+        if (book == null) {
+            throw new BookNotFoundException("Book with ID " + bookId + " not found in catalog.");
+        }
+    }
+
     /**
      * Returns the latest version of the book from the catalog corresponding to the specified book id.
      * Throws a BookNotFoundException if the latest version is not active or no version is found.
