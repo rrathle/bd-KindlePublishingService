@@ -16,7 +16,7 @@ import javax.inject.Singleton;
 @Singleton
 public class BookPublisher {
 
-    private static final Logger log = LogManager.getLogger(BookPublisher.class);
+    private static final Logger LOGGER = LogManager.getLogger(BookPublisher.class);
 
     private final ScheduledExecutorService scheduledExecutorService;
     private final Runnable publishTask;
@@ -43,8 +43,17 @@ public class BookPublisher {
             return;
         }
         isRunning = true;
-        scheduledExecutorService.scheduleWithFixedDelay(publishTask, 0, 1, TimeUnit.SECONDS);
+
+        int threadCount = 3;
+
+
+        for (int i = 0; i < threadCount; i++) {
+            scheduledExecutorService.scheduleWithFixedDelay(() -> {
+                publishTask.run();
+            }, 0, 1, TimeUnit.SECONDS);
+        }
     }
+
 
     /**
      * Stop publishing books.

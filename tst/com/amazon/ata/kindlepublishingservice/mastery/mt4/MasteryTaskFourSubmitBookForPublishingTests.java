@@ -69,6 +69,7 @@ public class MasteryTaskFourSubmitBookForPublishingTests extends IntegrationTest
         PublishingStatusRecord successful = waitForExpectedStatus(response.getPublishingRecordId(),
             PublishingStatus.SUCCESSFUL);
 
+        assert successful != null;
         assertNotNull(successful.getBookId(), "A successful PublishingStatusRecord should contain a bookId.");
 
         // a book should exist now
@@ -143,22 +144,22 @@ public class MasteryTaskFourSubmitBookForPublishingTests extends IntegrationTest
 
         Book book = getBookResponse.getBook();
         assertEquals(book.getAuthor(), request.getAuthor(), "Expected a successful book publish request" +
-            "to create a book with the provided author");
+            " to create a book with the provided author");
         assertEquals(book.getBookId(), successful.getBookId(), "Expected a successful book publish request" +
-            "to create a book with the request's book ID");
+            " to create a book with the request's book ID");
         assertEquals(book.getGenre(), request.getGenre(), "Expected a successful book publish request" +
-            "to create a book with the provided genre");
+            " to create a book with the provided genre");
         assertEquals(book.getText(), request.getText(), "Expected a successful book publish request" +
-            "to create a book with the provided text");
+            " to create a book with the provided text");
         assertEquals(book.getTitle(), request.getTitle(), "Expected a successful book publish request" +
-            "to create a book with the provided title");
+            " to create a book with the provided title");
         assertEquals(book.getVersion(), existingBook.getVersion() + 1, "Expected a successful book publish request" +
-            "to create a new book with an incremented version");
+            " to create a new book with an incremented version");
 
         // previous book version should be marked inactive
         CatalogItemVersion versionOneBook = super.getTestDao().load(existingBook);
         assertTrue(versionOneBook.isInactive(), "Expected a successful book publish request" +
-            "to mark the previous version inactive");
+            " to mark the previous version inactive");
     }
 
     private PublishingStatusRecord waitForExpectedStatus(String publishingRecordId,

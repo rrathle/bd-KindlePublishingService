@@ -15,6 +15,7 @@ public class SubmitBookForPublishingRequest {
         this.author = author;
         this.text = text;
         this.genre = genre;
+        System.out.println("-----"+ bookId + "-----");
     }
 
     public String getBookId() {
@@ -66,7 +67,7 @@ public class SubmitBookForPublishingRequest {
                 Objects.equals(title, that.title) &&
                 Objects.equals(author, that.author) &&
                 Objects.equals(text, that.text) &&
-                genre == that.genre;
+                Objects.equals(genre, that.genre);
     }
 
     @Override
@@ -121,6 +122,7 @@ public class SubmitBookForPublishingRequest {
             return this;
         }
 
-        public SubmitBookForPublishingRequest build() { return new SubmitBookForPublishingRequest(this); }
+        public SubmitBookForPublishingRequest build() {return new SubmitBookForPublishingRequest(this); }
+
     }
 }

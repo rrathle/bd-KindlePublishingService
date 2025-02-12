@@ -2,17 +2,24 @@ package com.amazon.ata.kindlepublishingservice.dao;
 
 import com.amazon.ata.kindlepublishingservice.dynamodb.models.CatalogItemVersion;
 import com.amazon.ata.kindlepublishingservice.exceptions.BookNotFoundException;
+import com.amazon.ata.kindlepublishingservice.publishing.BookPublishRequest;
+import com.amazon.ata.kindlepublishingservice.publishing.BookPublishRequestManager;
 import com.amazon.ata.kindlepublishingservice.publishing.KindleFormattedBook;
 import com.amazon.ata.kindlepublishingservice.utils.KindlePublishingUtils;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.UUID;
 import javax.inject.Inject;
 
 public class CatalogDao {
+
+    private static final Logger LOGGER = LogManager.getLogger(BookPublishRequestManager.class);
 
     private final DynamoDBMapper dynamoDbMapper;
 
@@ -68,4 +75,39 @@ public class CatalogDao {
     public void save(CatalogItemVersion catalogItemVersion) {
         dynamoDbMapper.save(catalogItemVersion);
     }
+
+    public String createOrUpdateBook(BookPublishRequest request) {
+//        LOGGER.info("Processing request for book: {}", request.getPublishingRecordId());
+
+        // If no bookId is provided, generate a new one
+        String bookId = StringUtils.isBlank(request.getBookId()) ?
+                "book." + UUID.randomUUID().toString() :
+                request.getBookId();
+
+        CatalogItemVersion book = getLatestVersionOfBook(bookId);
+        int newVersion = (book == null) ? 1 : book.getVersion() + 1;
+
+        // If there's an existing book, mark it as inactive
+        if (book != null) {
+            book.setInactive(true);
+            save(book);
+        }
+
+        // Create the new book version
+        CatalogItemVersion newBookVersion = new CatalogItemVersion();
+        newBookVersion.setBookId(bookId);
+        newBookVersion.setTitle(request.getTitle());
+        newBookVersion.setAuthor(request.getAuthor());
+        newBookVersion.setGenre(request.getGenre());
+        newBookVersion.setText(request.getText());
+        newBookVersion.setVersion(newVersion);
+        newBookVersion.setInactive(false);
+
+        // Save new book to the database
+        save(newBookVersion);
+
+        return newBookVersion.getBookId();
+    }
+
+
 }
